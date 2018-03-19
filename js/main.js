@@ -127,7 +127,10 @@ function DOMDisplay(parent, level) {
   this.drawFrame();
 }
 
+// scale makes it so the the pixels will take up enough space on the screen
 var scale = 20;
+
+//uses scale to draw the background (a table element with the class background)and uses forEach to add the tr elements and the td elements inside the table
 
 DOMDisplay.prototype.drawBackground = function() {
   var table = elt("table", "background");
@@ -142,6 +145,8 @@ DOMDisplay.prototype.drawBackground = function() {
   return table;
 };
 
+//creates the actor elements using the drawActors function
+
 DOMDisplay.prototype.drawActors = function() {
   var wrap = elt("div");
   this.level.actors.forEach(function(actor) {
@@ -155,6 +160,8 @@ DOMDisplay.prototype.drawActors = function() {
   return wrap;
 };
 
+// drawFrame will redraw the actors into new positions
+
 DOMDisplay.prototype.drawFrame = function() {
   if (this.actorLayer)
     this.wrap.removeChild(this.actorLayer);
@@ -162,6 +169,8 @@ DOMDisplay.prototype.drawFrame = function() {
   this.wrap.className = "game " + (this.level.status || "");
   this.scrollPlayerIntoView();
 };
+
+
 
 DOMDisplay.prototype.scrollPlayerIntoView = function() {
   var width = this.wrap.clientWidth;
@@ -186,10 +195,13 @@ DOMDisplay.prototype.scrollPlayerIntoView = function() {
     this.wrap.scrollTop = center.y + margin - height;
 };
 
+// clears the level when finished or to reset
+
 DOMDisplay.prototype.clear = function() {
   this.wrap.parentNode.removeChild(this.wrap);
 };
 
+// tells/reads where there is a wall or lava is
 Level.prototype.obstacleAt = function(pos, size) {
   var xStart = Math.floor(pos.x);
   var xEnd = Math.ceil(pos.x + size.x);
@@ -208,6 +220,8 @@ Level.prototype.obstacleAt = function(pos, size) {
   }
 };
 
+// reads/tells if there is an overlap between player and another actor
+
 Level.prototype.actorAt = function(actor) {
   for (var i = 0; i < this.actors.length; i++) {
     var other = this.actors[i];
@@ -222,6 +236,9 @@ Level.prototype.actorAt = function(actor) {
 
 var maxStep = 0.05;
 
+
+// creates the ability to move, step is time step in sec, keys object is how to read the arrow keys
+
 Level.prototype.animate = function(step, keys) {
   if (this.status != null)
     this.finishDelay -= step;
@@ -234,6 +251,8 @@ Level.prototype.animate = function(step, keys) {
     step -= thisStep;
   }
 };
+
+// The act functions are to tell change the position of moving actors
 
 Lava.prototype.act = function(step, level) {
   var newPos = this.pos.plus(this.speed.times(step));
@@ -255,6 +274,8 @@ Coin.prototype.act = function(step) {
 
 var playerXSpeed = 7;
 
+// running/walking movement
+
 Player.prototype.moveX = function(step, level, keys) {
   this.speed.x = 0;
   if (keys.left) this.speed.x -= playerXSpeed;
@@ -271,6 +292,8 @@ Player.prototype.moveX = function(step, level, keys) {
 
 var gravity = 30;
 var jumpSpeed = 17;
+
+// jump movement
 
 Player.prototype.moveY = function(step, level, keys) {
   this.speed.y += step * gravity;
@@ -303,6 +326,8 @@ Player.prototype.act = function(step, level, keys) {
   }
 };
 
+// collisions between player and other objects
+
 Level.prototype.playerTouched = function(type, actor) {
   if (type == "lava" && this.status == null) {
     this.status = "lost";
@@ -320,6 +345,8 @@ Level.prototype.playerTouched = function(type, actor) {
   }
 };
 
+// reads the arrow keys
+
 var arrowCodes = {37: "left", 38: "up", 39: "right"};
 
 function trackKeys(codes) {
@@ -336,6 +363,8 @@ function trackKeys(codes) {
   return pressed;
 }
 
+// draws the frame and controls the animation
+
 function runAnimation(frameFunc) {
   var lastTime = null;
   function frame(time) {
@@ -350,6 +379,8 @@ function runAnimation(frameFunc) {
   }
   requestAnimationFrame(frame);
 }
+
+// lets the player run through the level and then stop the display and animation
 
 var arrows = trackKeys(arrowCodes);
 
@@ -366,6 +397,9 @@ function runLevel(level, Display, andThen) {
     }
   });
 }
+
+
+// the levels for the game in and array
 
 var GAME_LEVELS = [
   ["                                                                                ",
@@ -508,6 +542,7 @@ var GAME_LEVELS = [
 if (typeof module != "undefined" && module.exports)
   module.exports = GAME_LEVELS;
 
+// runs the game with the right level and changes levels when win
 
 function runGame(plans, Display) {
   function startLevel(n) {

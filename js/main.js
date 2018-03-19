@@ -1,3 +1,5 @@
+// the array describes 2D grid for a level without first having a level editor
+
 var simpleLevelPlan = [
   "                      ",
   "                      ",
@@ -9,6 +11,10 @@ var simpleLevelPlan = [
   "      xxxxxxxxxxxxxx  ",
   "                      "
 ];
+
+// x = walls, ! = fixed lava, @ = start, o = coin, = is side moving lava
+
+// Level Object will will read the array for the level and draws out the walls, lava, and starts to prepare for when the player is finished for the screen to delay for a bit
 
 function Level(plan) {
   this.width = plan[0].length;
@@ -38,9 +44,13 @@ function Level(plan) {
   this.status = this.finishDelay = null;
 }
 
+// Tracks if the player won or lost to preform the delay
+
 Level.prototype.isFinished = function() {
   return this.status != null && this.finishDelay < 0;
 };
+
+// Vector will find the point on the grid
 
 function Vector(x, y) {
   this.x = x; this.y = y;
@@ -48,6 +58,9 @@ function Vector(x, y) {
 Vector.prototype.plus = function(other) {
   return new Vector(this.x + other.x, this.y + other.y);
 };
+
+// Vector times function will helps scale the vector to affect the speed
+
 Vector.prototype.times = function(factor) {
   return new Vector(this.x * factor, this.y * factor);
 };
@@ -58,12 +71,16 @@ var actorChars = {
   "=": Lava, "|": Lava, "v": Lava
 };
 
+// Player builds the player object
+
 function Player(pos) {
   this.pos = pos.plus(new Vector(0, -0.5));
   this.size = new Vector(0.8, 1.5);
   this.speed = new Vector(0, 0);
 }
 Player.prototype.type = "player";
+
+// Lava object created the side moving, dripping, and vertical moving lava
 
 function Lava(pos, ch) {
   this.pos = pos;
@@ -79,6 +96,8 @@ function Lava(pos, ch) {
 }
 Lava.prototype.type = "lava";
 
+// Coin object
+
 function Coin(pos) {
   this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
   this.size = new Vector(0.6, 0.6);
@@ -86,13 +105,18 @@ function Coin(pos) {
 }
 Coin.prototype.type = "coin";
 
+// Creating new level based off of the simpleLevelPlan array
 var simpleLevel = new Level(simpleLevelPlan);
+
+// Creating an element and if it has a classname it will add the class
 
 function elt(name, className) {
   var elt = document.createElement(name);
   if (className) elt.className = className;
   return elt;
 }
+
+// set up the display into the parent element which will be a div with the class of game
 
 function DOMDisplay(parent, level) {
   this.wrap = parent.appendChild(elt("div", "game"));
